@@ -86,13 +86,13 @@
 
         <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500">
             <p class="text-sm text-slate-500 font-medium">İşlem Adedi</p>
-            <h2 class="text-3xl font-bold text-slate-800" x-text="expenses.lenght"></h2>
+            <h2 class="text-3xl font-bold text-slate-800" x-text="expenses.length"></h2>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-amber-500">
             <p class="text-sm text-slate-500 font-medium">En Büyük Harcama</p>
             <h2 class="text-3xl font-bold text-slate-800">
-                ₺<span x-text="matExpense()"></span>
+                ₺<span x-text="maxExpense()"></span>
             </h2>
         </div>
     </div>
@@ -144,9 +144,9 @@
 
             // Toplam tutarını hesaplayan fonksiyon
             totalAmount() {
-                return this.expenses.
-                reduce((sum, item) => sum + parseFloat(item.amount), 0)
-                    .toLocalString('tr-TR', {
+                return this.expenses
+                    .reduce((sum, item) => sum + parseFloat(item.amount), 0)
+                    .toLocaleString('tr-TR', {
                         minimumFractionDigits: 2
                     });
             },
@@ -168,8 +168,8 @@
                 const colors = {
                     'Gıda': 'bg-red-100 text-red-700',
                     'Eğlence': 'bg-purple-100 text-purple-700',
-                    'Ulaşım': 'bg-blue-100 text-blue-100',
-                    'Fatura': 'bg-orange-100 text-orange-100',
+                    'Ulaşım': 'bg-blue-100 text-blue-700',
+                    'Fatura': 'bg-orange-100 text-orange-700',
                     'Diğer': 'bg-slate-100 text-slate-700'
                 };
                 return colors[cat] || 'bg-gray-100';
