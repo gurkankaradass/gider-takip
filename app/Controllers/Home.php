@@ -44,4 +44,11 @@ class Home extends BaseController
         $model->insert($data);
         return redirect()->to("/")->with('succes', 'Harcama başarıyla eklendi!');
     }
+
+    public function delete($id)
+    {
+        $model = new ExpenseModel();
+        $model->delete($id);
+        return redirect()->to('/')->with('success', 'Harcama Silindi.');
+    }
 }

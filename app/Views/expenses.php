@@ -121,7 +121,8 @@
                     <tr>
                         <th class="px-6 py-3">Açıklama</th>
                         <th class="px-6 py-3">Kategori</th>
-                        <th class="px-6 py-3 text-right">Tutar</th>
+                        <th class="pl-6 py-3 text-right">Tutar</th>
+                        <th class="pr-6 py-3 text-right"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -135,8 +136,19 @@
                                 <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase"
                                     :class="categoryClass(item.category)" x-text="item.category"></span>
                             </td>
-                            <td class="px-6 py-4 text-right font-bold text-slate-700">
+                            <td class="pl-6 py-4 text-right font-bold text-slate-700">
                                 ₺<span x-text="parseFloat(item.amount).toLocaleString('tr-TR')"></span>
+                            </td>
+                            <td class="pr-6 py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <a href="<?= base_url('expenses/delete/') ?>"
+                                        @click.prevent="if(confirm('Bu harcamayı silmek istediğinize emin misiniz?')) window.location.href='<?= base_url('expenses/delete/') ?>' + item.id"
+                                        class="p-2 text-slate-400 hover:text-red-600 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     </template>

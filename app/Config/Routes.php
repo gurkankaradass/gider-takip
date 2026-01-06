@@ -7,3 +7,4 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 $routes->post('expenses/create', 'Home::create');
+$routes->get('/expenses/delete/(:num)', 'Home::delete/$1');
