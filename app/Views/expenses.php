@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-<div x-data="expenseApp(<?= htmlspecialchars(json_encode($expenses)) ?>)" class="space-y-6">
+<div x-data="expenseApp(<?= htmlspecialchars(json_encode($expenses)) ?>)">
 
     <div class="flex justify-end mb-4">
         <button @click="showModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105">
@@ -38,17 +38,28 @@
             <form action="<?= base_url('expenses/create') ?>" method="post" class="p-6 space-y-4">
                 <?= csrf_field() ?>
 
+                <?php if (session()->has('errors')): ?>
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                        <ul class="text-sm text-red-700">
+                            <?php foreach (session('errors') as $error): ?>
+                                <li>⚠️ <?= esc($error) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Harcama Başlığı</label>
-                    <input type="text" name="title" required placeholder="Örn: Market Alışverişi"
+                    <input type="text" name="title" x-model="title" required placeholder="Örn: Market Alışverişi"
                         class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Tutar (₺)</label>
-                        <input type="number" step="0.01" name="amount" required placeholder="0.00"
+                        <input type="number" step="0.01" name="amount" x-model.number="tempAmount" required placeholder="0.00"
                             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <p x-show="tempAmount < 0" class="text-xs text-red-500 mt-1 italic">Harcama tutarı negatif olamaz!</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Kategori</label>
@@ -70,7 +81,7 @@
 
                 <div class="pt-4 flex gap-3">
                     <button type="button" @click="showModal = false" class="flex-1 px-4 py-2 border rounded-lg hover:bg-slate-50 font-medium transition">İptal</button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold transition">Kaydet</button>
+                    <button type="submit" :disabled="tempAmount <= 0 || title.length < 3" :class="tempAmount <=0 || title.length < 3 ? 'cursor-not-allowed' : 'cursor-pointer'" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold transition">Kaydet</button>
                 </div>
             </form>
         </div>
@@ -140,7 +151,10 @@
         return {
             expenses: initialData,
             search: "",
-            showModal: false, // Modal'ın açık/kapalı durumunu tutar
+            // PHP tarafında 'errors' session verisi varsa true, yoksa false başlar
+            showModal: <?= session()->has('errors') ? 'true' : 'false' ?>, // Modal'ın açık/kapalı durumunu tutar
+            title: "",
+            tempAmount: "",
 
             // Toplam tutarını hesaplayan fonksiyon
             totalAmount() {

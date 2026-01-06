@@ -20,6 +20,18 @@ class Home extends BaseController
     {
         $model = new ExpenseModel();
 
+        $rules = [
+            'title' => 'required|min_length[3]|max_length[255]',
+            'amount' => 'required|decimal|greater_than[0]',
+            'category' => 'required',
+            'expense_date' => 'required|valid_date',
+        ];
+
+        if (!$this->validate($rules)) {
+            // Eğer doğrulama başarısız olursa, hatalarla birlikte geri dön
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        };
+
         // Verileri topluyoruz
         $data = [
             'title' => $this->request->getPost('title'),
@@ -30,6 +42,6 @@ class Home extends BaseController
 
         // Kaydet ve geri dön
         $model->insert($data);
-        return redirect()->to("/");
+        return redirect()->to("/")->with('succes', 'Harcama başarıyla eklendi!');
     }
 }
