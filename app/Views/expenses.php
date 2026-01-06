@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-<div x-data="expenseApp(<?= htmlspecialchars(json_encode($expenses)) ?>)">
+<div x-data="expenseApp(<?= htmlspecialchars(json_encode($expenses)) ?>)" class="space-y-4">
 
     <div class="flex justify-end mb-4">
         <button @click="showModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105">
@@ -108,6 +108,26 @@
         </div>
     </div>
 
+    <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+        <h3 class="font-bold text-slate-700 text-sm italic">Kategori Dağılımı</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <template x-for="(percent, cat) in categoryStats" :key="cat">
+                <div class="space-y-1">
+                    <div class="flex justify-between text-sm font-bold">
+                        <span x-text="cat" class="text-slate-600"></span>
+                        <span x-text="'%' + percent" class="text-indigo-600"></span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div class="h-full transition-all duration-500 ease-out"
+                            :class="getBarColor(cat)"
+                            :style="'width: ' + percent + '%'"></div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
     <div class="bg-white rounded-2xl shadow-sm borderr overflow-hidden">
         <div class="p-4 border-b bg-slate-50/50 flex flex-col md:flex-row justify-between gap-4">
             <h3 class="font-bold text-slate-700 self-center">Harcama Geçmişi</h3>
@@ -199,6 +219,37 @@
                     'Diğer': 'bg-slate-100 text-slate-700'
                 };
                 return colors[cat] || 'bg-gray-100';
+            },
+
+            get categoryStats() {
+                let stats = {};
+                let total = this.expenses.reduce((sum, i) => sum + parseFloat(i.amount), 0);
+
+                if (total === 0) return stats;
+
+                // Her kategorinin toplamını bul
+                this.expenses.forEach(item => {
+                    stats[item.category] = (stats[item.category] || 0) + parseFloat(item.amount);
+                });
+
+                // Toplamları yüzdeye çevir
+                Object.keys(stats).forEach(cat => {
+                    stats[cat] = ((stats[cat] / total) * 100).toFixed(0);
+                });
+
+                return stats;
+            },
+
+            getBarColor(cat) {
+                const colors = {
+                    'Gıda': 'bg-red-500',
+                    'Eğlence': 'bg-purple-500',
+                    'Ulaşım': 'bg-blue-500',
+                    'Fatura': 'bg-orange-500',
+                    'Diğer': 'bg-slate-500'
+                };
+
+                return colors[cat] || 'bg-indigo-500';
             }
         }
     }
