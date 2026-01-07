@@ -4,7 +4,14 @@
 
 <div x-data="expenseApp(<?= htmlspecialchars(json_encode($expenses)) ?>)">
 
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-end mb-4 gap-2">
+        <a href="<?= base_url('expenses/export') ?>" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl shadow-xl transition flex items-center gap-2 text-sm">
+            📥 CSV İndir
+        </a>
+        <a href="<?= base_url('expenses/export') ?>" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl shadow-xl transition flex items-center gap-2 text-sm">
+            📥 XLSX İndir
+        </a>
+
         <button @click="showModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105">
             + Yeni Gider Ekle
         </button>
