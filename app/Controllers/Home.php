@@ -42,7 +42,7 @@ class Home extends BaseController
 
         // Kaydet ve geri dön
         $model->insert($data);
-        return redirect()->to("/")->with('succes', 'Harcama başarıyla eklendi!');
+        return redirect()->to("/")->with('success', 'Harcama başarıyla eklendi!');
     }
 
     public function delete($id)

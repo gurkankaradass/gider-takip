@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-<div x-data="expenseApp(<?= htmlspecialchars(json_encode($expenses)) ?>)" class="space-y-4">
+<div x-data="expenseApp(<?= htmlspecialchars(json_encode($expenses)) ?>)">
 
     <div class="flex justify-end mb-4">
         <button @click="showModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105">
@@ -139,9 +139,13 @@
             <table class="w-full text-left border-collapse">
                 <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
                     <tr>
-                        <th class="px-6 py-3">Açıklama</th>
-                        <th class="px-6 py-3">Kategori</th>
-                        <th class="pl-6 py-3 text-right">Tutar</th>
+                        <th class="px-6 py-3 cursor-pointer hover:text-indigo-600 transition" @click="toggleSort('date')">Açıklama
+                            <span x-show="sortBy === 'date'" x-text="sortDir === 'asc' ? '↑' : '↓'"></span>
+                        </th>
+                        <th class="px-6 py-3 text-center">Kategori</th>
+                        <th class="pl-6 py-3 text-right cursor-pointer hover:text-indigo-600 transition" @click="toggleSort('amount')">Tutar
+                            <span x-show="sortBy === 'amount'" x-text="sortDir === 'asc' ? '↑' : '↓'"></span>
+                        </th>
                         <th class="pr-6 py-3 text-right"></th>
                     </tr>
                 </thead>
@@ -152,7 +156,7 @@
                                 <div class="font-medium text-slate-800" x-text="item.title"></div>
                                 <div class="text-xs text-slate-400" x-text="item.expense_date"></div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 text-center">
                                 <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase"
                                     :class="categoryClass(item.category)" x-text="item.category"></span>
                             </td>
@@ -187,6 +191,8 @@
             showModal: <?= session()->has('errors') ? 'true' : 'false' ?>, // Modal'ın açık/kapalı durumunu tutar
             title: "",
             tempAmount: "",
+            sortBy: 'date', // Hangi sütuna göre sıralanacak
+            sortDir: 'desc', // 'asc' (artan) veya 'desc' (azalan)
 
             // Toplam tutarını hesaplayan fonksiyon
             totalAmount() {
@@ -206,7 +212,29 @@
 
             // Arama Filtresi
             get filteredExpenses() {
-                return this.expenses.filter(i => i.title.toLowerCase().includes(this.search.toLowerCase()));
+                let filtered = this.expenses.filter(i => i.title.toLowerCase().includes(this.search.toLowerCase()));
+
+                // Sıralam Mantığı
+                return filtered.sort((a, b) => {
+                    let modifier = this.sortDir == 'asc' ? 1 : -1;
+
+                    if (this.sortBy === 'amount') {
+                        return (parseFloat(a.amount) - parseFloat(b.amount)) * modifier;
+                    } else {
+                        // Varsayılan: Tarihe göre
+                        return (new Date(a.expense_date) - new Date(b.expense_date)) * modifier;
+                    }
+                });
+            },
+
+            // Sıralama değiştirme fonksiyonu
+            toggleSort(column) {
+                if (this.sortBy === column) {
+                    this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.sortBy = column;
+                    this.sortDir = 'desc';
+                }
             },
 
             // Kategoriye göre renk döndürme
@@ -254,5 +282,15 @@
         }
     }
 </script>
+
+<?php if (session()->has('success')): ?>
+    <div x-data="{show: true}"
+        x-init="setTimeout(() => show = false, 3000)"
+        x-show="show"
+        x-transition.duration.500ms
+        class="fixed bottom-5 right-5 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-[60] flex items-center gap-3">
+        <span>✅ <?= session('success') ?></span>
+    </div>
+<?php endif; ?>
 
 <?= $this->endSection() ?>
